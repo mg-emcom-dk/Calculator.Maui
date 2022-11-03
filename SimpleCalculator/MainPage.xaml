@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimpleCalculator.MainPage"
+             Padding="{OnPlatform Android='0,20,0,0'}"
+             BackgroundColor="{DynamicResource Secondary}">
+    
+    <!--Styles-->
+    <ContentPage.Resources>
+        
+        <!--Special Operant buttons-->
+        <Style x:Key="specialOperantBtn" TargetType="Button" >
+            <Setter Property="TextColor" Value="DarkGrey" />
+            <Setter Property="BackgroundColor" Value="LightGray" />
+            <Setter Property="FontFamily" Value="OpenSansRegular"/>
+            <Setter Property="FontSize" Value="35"/>
+            <Setter Property="CornerRadius" Value="1"/>
+        </Style>
+
+        <!--Operant buttons-->
+        <Style x:Key="operantBtn" TargetType="Button" >
+            <Setter Property="TextColor" Value="DarkGrey" />
+            <Setter Property="BackgroundColor" Value="BlueViolet" />
+            <Setter Property="FontFamily" Value="OpenSansRegular"/>
+            <Setter Property="FontSize" Value="35"/>
+            <Setter Property="CornerRadius" Value="1"/>
+        </Style>
+
+        <!--Number buttons-->
+        <Style x:Key="numberBtn" TargetType="Button" >
+            <Setter Property="TextColor" Value="DarkGrey" />
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="FontFamily" Value="OpenSansRegular"/>
+            <Setter Property="FontSize" Value="35"/>
+            <Setter Property="CornerRadius" Value="1"/>            
+        </Style>
+
+        <!--Result label-->
+        <Style x:Key="resultLabel" TargetType="Label" >
+            <Setter Property="TextColor" Value="Orange" />
+            <Setter Property="HorizontalTextAlignment" Value="End" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="LineBreakMode" Value="NoWrap" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="BackgroundColor" Value="White" />            
+            <Setter Property="FontSize" Value="50"/>
+        </Style>
+
+        <!--Result label-->
+        <Style x:Key="historyLabel" TargetType="Label" >
+            <Setter Property="TextColor" Value="Gray" />
+            <Setter Property="HorizontalTextAlignment" Value="End" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="LineBreakMode" Value="NoWrap" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="BackgroundColor" Value="White" />
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+
+    </ContentPage.Resources>
+    
+    
+
+
+    <Grid
+        Padding="5"
+        BackgroundColor="White"
+        ColumnSpacing="1"
+        RowSpacing="1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />    
+        </Grid.ColumnDefinitions>
+
+        <!--Result field-->
+        <Grid            
+            Grid.ColumnSpan="4">
+            <Grid.RowDefinitions>               
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Label
+            x:Name="currentOperationHistoryLabel"
+            Style="{StaticResource historyLabel}" 
+                Grid.Row="2"
+            Grid.ColumnSpan="4"            
+            Text="0" />
+            
+            <Label
+            x:Name="result"
+            Style="{StaticResource resultLabel}" 
+                Grid.Row="3"
+            Grid.ColumnSpan="4"            
+            Text="0" />
+            
+        </Grid>
+        
+        <!--Clear Button-->
+        <Button
+            Style="{StaticResource specialOperantBtn}"
+            Text="C"
+            Clicked="OnClear"
+            Grid.Row="1" 
+            Grid.ColumnSpan="2" />
+
+        <!--squared / squareRoot-->
+        <Grid
+            Grid.Row="1" 
+            Grid.Column="2"
+            RowSpacing="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />                
+            </Grid.RowDefinitions>
+
+            <Button
+                Style="{StaticResource specialOperantBtn}"
+                Text="x2"
+                Clicked="OnSquared"
+                FontSize="18" 
+                Grid.Row="0" 
+                Grid.Column="0"/>
+
+            <Button
+                Style="{StaticResource specialOperantBtn}"
+                Text="Sqrt"
+                Clicked="OnSquareRoot"
+                FontSize="18" 
+                Grid.Row="1" 
+                Grid.Column="0"/>   
+        </Grid>
+        
+        <!--Operant button-->
+        <Button
+                Style="{StaticResource operantBtn}"
+                Text="/"
+                Clicked="OnOperantSelection"                
+                Grid.Row="1" 
+                Grid.Column="3"/>
+        <!--Operant button-->
+        <Button
+                Style="{StaticResource operantBtn}"
+                Text="*"
+                Clicked="OnOperantSelection"                 
+                Grid.Row="2" 
+                Grid.Column="3"/>
+        <!--Operant button-->
+        <Button
+                Style="{StaticResource operantBtn}"
+                Text="-"
+                Clicked="OnNegativeNumber"                
+                Grid.Row="3" 
+                Grid.Column="3"/>
+        <!--Operant button-->
+        <Button
+                Style="{StaticResource operantBtn}"
+                Text="+"
+                Clicked="OnOperantSelection"                
+                Grid.Row="4" 
+                Grid.Column="3"/>
+        <!--Operant button-->
+        <Button
+                Style="{StaticResource operantBtn}"
+                Text="="
+                Clicked="OnCalculate"                
+                Grid.Row="5" 
+                Grid.Column="3"/>
+               
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="7"
+                Clicked="OnNumberSelection"                
+                Grid.Row="2" 
+                Grid.Column="0"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="8"
+                Clicked="OnNumberSelection"                
+                Grid.Row="2" 
+                Grid.Column="1"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="9"
+                Clicked="OnNumberSelection"                
+                Grid.Row="2" 
+                Grid.Column="2"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="4"
+                Clicked="OnNumberSelection"                
+                Grid.Row="3" 
+                Grid.Column="0"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="5"
+                Clicked="OnNumberSelection"                
+                Grid.Row="3" 
+                Grid.Column="1"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="6"
+                Clicked="OnNumberSelection"                
+                Grid.Row="3" 
+                Grid.Column="2"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="1"
+                Clicked="OnNumberSelection"                
+                Grid.Row="4" 
+                Grid.Column="0"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="2"
+                Clicked="OnNumberSelection"                
+                Grid.Row="4" 
+                Grid.Column="1"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="3"
+                Clicked="OnNumberSelection"                
+                Grid.Row="4" 
+                Grid.Column="2"/>
+        <!--Number button-->
+        <Button
+                Style="{StaticResource numberBtn}"
+                Text="0"
+                Clicked="OnNumberSelection"                
+                Grid.Row="5"
+                Grid.ColumnSpan="3"
+                Grid.Column="0"/>
+        
+    </Grid>
+
+</ContentPage>
