@@ -1,4 +1,5 @@
 ﻿using SimpleCalculator.Business;
+using SimpleCalculator.Models;
 using System.Linq;
 using System.Reflection.Emit;
 
@@ -14,8 +15,7 @@ public partial class MainPage : ContentPage
 
 	//history
 	string currentOperationHistory;
-	List<string> history = new();
-	
+    public List<string> history = new();  
 
 	public MainPage()
 	{
@@ -39,6 +39,7 @@ public partial class MainPage : ContentPage
 			return;
 		}
 
+		currentState = -1;
         //history
         currentOperationHistory = $"{firstNumber} * {firstNumber}";
         UpdateHistory(sender, e, currentOperationHistory);
@@ -53,6 +54,8 @@ public partial class MainPage : ContentPage
         {
             return;
         }
+
+        currentState = -1;
 
         //history
         currentOperationHistory = $"sqrt {firstNumber}";
@@ -111,22 +114,24 @@ public partial class MainPage : ContentPage
 		
 		Button button = (Button) sender;
 		string btnPressed = button.Text;
-		operant = btnPressed;
+		operant = btnPressed;        
 
-        if (negativeNumber == -1)
+        if ((negativeNumber == -1) && (currentState == -2))
         {
             this.result.Text = "-";
             negativeNumber = 1;
         }
         else
 		{
-            currentState = -2;
-            this.result.Text = "";
+            OnCalculate(sender, e);
+            currentState = -2;    			
+           // this.result.Text = "";            
         }
-
+        
         //history
         currentOperationHistory = $"{firstNumber} {operant}";
         UpdateHistory(sender, e, currentOperationHistory);
+        
     }
 
     void OnCalculate(object sender, EventArgs e)
@@ -147,20 +152,27 @@ public partial class MainPage : ContentPage
 	}
 
 	void UpdateHistory(object sender, EventArgs e, string currentHistory)
-	{
-		this.currentOperationHistoryLabel.Text = currentHistory;
-
-		if (currentState ==-1)
+	{   
+        if (currentState ==-1)
 		{
-            history.Add(currentOperationHistory);
-            // currentOperationHistory = string.Empty;
+            history.Reverse();
+            history.Add(currentHistory);			
+            
+            this.historyListView.ItemsSource = "";
+            this.historyListView.ItemsSource = history;
+            history.Reverse();
+
+            currentOperationHistory = string.Empty;
+			currentHistory = string.Empty;
         }
         else if(currentHistory=="")
 		{
-			history = new();
-            // currentOperationHistory = string.Empty;
+			history.Clear();
+            currentOperationHistory = string.Empty;
+            this.historyListView.ItemsSource = "";
         }
-
+        
+        this.currentOperationHistoryLabel.Text = currentHistory;
     }
 
 }
