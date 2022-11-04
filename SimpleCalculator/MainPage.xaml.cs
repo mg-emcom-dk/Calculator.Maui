@@ -1,5 +1,4 @@
 ﻿using SimpleCalculator.Business;
-using SimpleCalculator.Models;
 using System.Linq;
 using System.Reflection.Emit;
 
