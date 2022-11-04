@@ -15,14 +15,13 @@ public partial class MainPage : ContentPage
 
 	//history
 	string currentOperationHistory;
-	public List<string> history = new();
-	
+	public List<string> history = new();	
 
 	public MainPage()
 	{
 		InitializeComponent();
-		OnClear(this, null);
-	}
+		OnClear(this, null);        
+    }
 
 	void OnClear(object sender, EventArgs e)
 	{
@@ -156,12 +155,17 @@ public partial class MainPage : ContentPage
 	{   
         if (currentState ==-1)
 		{
-            history.Reverse();
+			// history.Reverse();
             history.Add(currentHistory);			
             
             this.historyListView.ItemsSource = "";
             this.historyListView.ItemsSource = history;
-            history.Reverse();
+
+			if (history.Count() > 3)
+			{
+                this.historyListView.ScrollTo(history.Last(), ScrollToPosition.End, false);
+            }           
+			//  history.Reverse();
 
             currentOperationHistory = string.Empty;
 			currentHistory = string.Empty;
@@ -172,7 +176,7 @@ public partial class MainPage : ContentPage
             currentOperationHistory = string.Empty;
             this.historyListView.ItemsSource = "";
         }
-        
+		
         this.currentOperationHistoryLabel.Text = currentHistory;
     }
 

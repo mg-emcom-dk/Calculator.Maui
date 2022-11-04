@@ -91,22 +91,23 @@
             Grid.ColumnSpan="4"
             x:Name="resultGrid">
             <Grid.RowDefinitions>               
-                <RowDefinition Height="auto" />                
+                <RowDefinition Height="*" />                
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             
             <!--list view-->            
             <ListView ItemsSource="{Binding history}"
-                    Grid.Row="2"
-                    x:Name="historyListView" >
+                    Grid.Row="0"
+                    Grid.ColumnSpan="4" 
+                    x:Name="historyListView">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <Label
                             Style="{StaticResource historyLabel}" 
                             Text="{Binding .}"
-                            FontSize="10"/>
+                            FontSize="10" />
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -126,7 +127,7 @@
             <Label
             x:Name="result"
             Style="{StaticResource resultLabel}" 
-                Grid.Row="0"
+                Grid.Row="2"
             Grid.ColumnSpan="4"            
             Text="0" />
             
