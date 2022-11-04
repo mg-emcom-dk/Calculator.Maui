@@ -154,20 +154,19 @@ public partial class MainPage : ContentPage
 	void UpdateHistory(object sender, EventArgs e, string currentHistory)
 	{   
         if (currentState ==-1)
-		{
-			// history.Reverse();
+		{			
             history.Add(currentHistory);			
             
             this.historyListView.ItemsSource = "";
             this.historyListView.ItemsSource = history;
 
+            //work around for listview Microsoft Bug
 			if (history.Count() > 3)
 			{
                 this.historyListView.ScrollTo(history.Last(), ScrollToPosition.End, false);
-            }           
-			//  history.Reverse();
-
-            currentOperationHistory = string.Empty;
+            }         
+			
+			currentOperationHistory = string.Empty;
 			currentHistory = string.Empty;
         }
         else if(currentHistory=="")
