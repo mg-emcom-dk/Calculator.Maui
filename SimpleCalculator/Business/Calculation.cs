@@ -22,15 +22,8 @@ public static class Calculation
             case "*":
                 result = firstNumber * secondNumber;
                 break;
-            case "/":
-                if (secondNumber != 0)
-                {
-                    result = firstNumber / secondNumber;
-                }
-                else
-                {
-                    result = 0;
-                }                
+            case "/":                
+                result = firstNumber / secondNumber;
                 break;
             default:
                 break;
