@@ -1,4 +1,5 @@
 ﻿using SimpleCalculator.Business;
+using SimpleCalculator.Models;
 using System.Linq;
 using System.Reflection.Emit;
 
@@ -14,7 +15,8 @@ public partial class MainPage : ContentPage
 
 	//history
 	string currentOperationHistory;
-    public List<string> history = new();  
+	public List<string> history = new();
+	
 
 	public MainPage()
 	{
