@@ -45,9 +45,10 @@
             <Setter Property="FontAttributes" Value="Bold" />
             <Setter Property="BackgroundColor" Value="White" />            
             <Setter Property="FontSize" Value="50"/>
+            <Setter Property="Padding" Value="15, 0"/>
         </Style>
 
-        <!--Result label-->
+        <!--History label-->
         <Style x:Key="historyLabel" TargetType="Label" >
             <Setter Property="TextColor" Value="Gray" />
             <Setter Property="HorizontalTextAlignment" Value="End" />
@@ -56,6 +57,7 @@
             <Setter Property="FontAttributes" Value="Bold" />
             <Setter Property="BackgroundColor" Value="White" />
             <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="15, 0"/>
         </Style>
 
     </ContentPage.Resources>
@@ -86,25 +88,45 @@
 
         <!--Result field-->
         <Grid            
-            Grid.ColumnSpan="4">
+            Grid.ColumnSpan="4"
+            x:Name="resultGrid">
             <Grid.RowDefinitions>               
+                <RowDefinition Height="auto" />                
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
+            
+            <!--list view-->            
+            <ListView ItemsSource="{Binding history}"
+                    Grid.Row="2"
+                    x:Name="historyListView" >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Label
+                            Style="{StaticResource historyLabel}" 
+                            Text="{Binding .}"
+                            FontSize="10"/>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
+            
 
+            <!--current history-->
             <Label
             x:Name="currentOperationHistoryLabel"
             Style="{StaticResource historyLabel}" 
-                Grid.Row="2"
+                Grid.Row="1"
             Grid.ColumnSpan="4"            
             Text="0" />
-            
+
+            <!--current result-->
             <Label
             x:Name="result"
             Style="{StaticResource resultLabel}" 
-                Grid.Row="3"
+                Grid.Row="0"
             Grid.ColumnSpan="4"            
             Text="0" />
             
