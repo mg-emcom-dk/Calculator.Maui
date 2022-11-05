@@ -1,33 +1,42 @@
 ﻿using SimpleCalculator.Business;
+using SimpleCalculator.Enums;
+using SimpleCalculator.Models;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection.Emit;
+using Prism.Mvvm;
 
 namespace SimpleCalculator;
 
-public partial class MainPage : ContentPage
+public partial class MainPage : ContentPage 
 {
-	int currentState = 1;
-	string operant;
+	CalculatorState currentState = CalculatorState.GetFirstNumber;
+    string operant = String.Empty;
 	double firstNumber;
 	double secondNumber;
 	int negativeNumber = 1;
 
 	//history
 	string currentOperationHistory;
-	public List<string> history = new();	
+    //ObservableCollection buggy
+    private ObservableCollection<History> history = new();
+     
 
-	public MainPage()
+    public MainPage()
 	{
 		InitializeComponent();
-		OnClear(this, null);        
+        //not needed as observable collection is not working
+        // this.historyListView.BindingContext = new History();       
+
+        OnClear(this, null);        
     }
 
 	void OnClear(object sender, EventArgs e)
 	{
 		firstNumber = 0;
-		secondNumber = 0;
-		currentState = 1;
-		this.result.Text = "0";
+		secondNumber = 0;        
+        currentState = CalculatorState.GetFirstNumber;
+        this.result.Text = "0";
 		UpdateHistory(sender, e, "");
 	}
 
@@ -37,8 +46,8 @@ public partial class MainPage : ContentPage
 		{
 			return;
 		}
-
-		currentState = -1;
+        
+        currentState = CalculatorState.CalculationCompleted;
         //history
         currentOperationHistory = $"{firstNumber} * {firstNumber}";
         UpdateHistory(sender, e, currentOperationHistory);
@@ -53,8 +62,8 @@ public partial class MainPage : ContentPage
         {
             return;
         }
-
-        currentState = -1;
+       
+        currentState = CalculatorState.CalculationCompleted;
 
         //history
         currentOperationHistory = $"sqrt {firstNumber}";
@@ -69,23 +78,36 @@ public partial class MainPage : ContentPage
 		Button button = (Button) sender;
 		string btnPressed = button.Text;
         double number;
-
-        if (this.result.Text =="0" || currentState < 0)
-		{
-			this.result.Text = string.Empty;
-			if (currentState < 0) 
-			{ 
-				currentState *= -1;	
-			}
-		}
-
-        this.result.Text += btnPressed;				
         
+        if (this.result.Text == "0" || 
+			currentState == CalculatorState.CalculationCompleted || 
+			currentState == CalculatorState.GetSecondNumber )
+        {
+			this.result.Text = string.Empty;
+            
+            if (currentState == CalculatorState.CalculationCompleted) 
+                currentState = CalculatorState.GetFirstNumber;
+            
+            if (currentState == CalculatorState.GetSecondNumber)              	
+                currentState = CalculatorState.ReadyToCalculate;            
+        }
+
+        if (negativeNumber == -1)
+        {
+            this.result.Text += $"-{btnPressed}";
+            negativeNumber = 1;
+        } 
+        else
+        {
+            this.result.Text += btnPressed;
+        } 
+
 		if (double.TryParse(this.result.Text, out number))
 		{
             this.result.Text = number.ToString("N0");
-            if (currentState == 1) 
-			{ 
+            
+            if (currentState == CalculatorState.GetFirstNumber)
+            { 
 				firstNumber = number;                
             }
             else 
@@ -97,70 +119,86 @@ public partial class MainPage : ContentPage
     
 	void OnNegativeNumber(object sender, EventArgs e)
 	{
-		if (currentState == 1)
-		{
-			negativeNumber = -1;
-		}
-		else
-		{
+        if (this.result.Text == "-")
+        {
             negativeNumber = 1;
-        }
-		OnOperantSelection(sender, e);
+            this.result.Text = "";
+        }        
+        else if ((currentState == CalculatorState.GetFirstNumber ||
+                currentState == CalculatorState.GetSecondNumber) &&
+                (this.result.Text =="" || operant != String.Empty))
+        {
+            this.result.Text = "-";
+            negativeNumber = -1;
+		}
+		else if(this.result.Text != "-" && this.result.Text != "")
+		{
+            OnOperantSelection(sender, e);
+            negativeNumber = 1;
+        }		
 	}
 
     void OnOperantSelection(object sender, EventArgs e)
-	{
-		
+	{		
 		Button button = (Button) sender;
-		string btnPressed = button.Text;
-		operant = btnPressed;        
+		string btnPressed = button.Text;    
+        this.result.Text = String.Empty;        
 
-        if ((negativeNumber == -1) && (currentState == -2))
-        {
-            this.result.Text = "-";
-            negativeNumber = 1;
-        }
-        else
-		{
-            OnCalculate(sender, e);
-            currentState = -2;    			
-           // this.result.Text = "";            
-        }
-        
+        OnCalculate(sender, e, true);
+
+        operant = btnPressed;
+        currentState = CalculatorState.GetSecondNumber;
+           
         //history
         currentOperationHistory = $"{firstNumber} {operant}";
-        UpdateHistory(sender, e, currentOperationHistory);
-        
+        UpdateHistory(sender, e, currentOperationHistory);        
     }
 
-    void OnCalculate(object sender, EventArgs e)
-	{
-		if (currentState == 2)
-		{
+    //work around - optional parameters does not work with maui
+    void OnCalculateBtn(object sender, EventArgs e)
+    {
+        OnCalculate(sender, e);
+    }
+
+    void OnCalculate(object sender, EventArgs e, bool clearEntryField = false)
+    {        
+        if (currentState == CalculatorState.ReadyToCalculate)
+        {
 			var result = Calculation.Calculate(operant, firstNumber, secondNumber);
 			this.result.Text = result.ToString();
-			
-			currentState = -1;
 
-			//history
-			currentOperationHistory = $"{firstNumber} {operant} {secondNumber}";
+            currentState = CalculatorState.CalculationCompleted;
+
+            //history
+            currentOperationHistory = $"{firstNumber} {operant} {secondNumber}";
             UpdateHistory(sender, e, currentOperationHistory);	
 
             firstNumber = result;
+            operant = String.Empty;
+            if (clearEntryField)
+                this.result.Text = String.Empty;
         }
 	}
 
 	void UpdateHistory(object sender, EventArgs e, string currentHistory)
-	{   
-        if (currentState ==-1)
-		{			
-            history.Add(currentHistory);			
-            
+	{
+        if (currentState == CalculatorState.CalculationCompleted)
+        {			
+            history.Add(new History()
+            {
+                Display = currentHistory,
+                FirstNumber = firstNumber,
+                SecondNumber = secondNumber,
+                Operant = operant                
+            } );
+
+            //listview update broken - workaround
+            history.FirstOrDefault().IsUpdate = true;               
             this.historyListView.ItemsSource = "";
             this.historyListView.ItemsSource = history;
-
+            
             //work around for listview Microsoft Bug
-			if (history.Count() > 3)
+            if (history.Count() > 3)
 			{
                 this.historyListView.ScrollTo(history.Last(), ScrollToPosition.End, false);
             }         
@@ -171,6 +209,7 @@ public partial class MainPage : ContentPage
         else if(currentHistory=="")
 		{
 			history.Clear();
+            
             currentOperationHistory = string.Empty;
             this.historyListView.ItemsSource = "";
         }
