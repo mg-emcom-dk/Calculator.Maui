@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection.Emit;
 using Prism.Mvvm;
+using System.ComponentModel;
 
 namespace SimpleCalculator;
 
@@ -14,21 +15,19 @@ public partial class MainPage : ContentPage
     string operant = String.Empty;
 	double firstNumber;
 	double secondNumber;
-	int negativeNumber = 1;
+	int negativeNumber = 1;    
 
-	//history
-	string currentOperationHistory;
-    //ObservableCollection buggy
-    private ObservableCollection<History> history = new();
+    //ObservableCollection - doesnt work
+    //bindinglist - doesnt work
+    private BindingList<History> history = new();
      
-
+    
     public MainPage()
 	{
-		InitializeComponent();
+		InitializeComponent();        
         //not needed as observable collection is not working
-        // this.historyListView.BindingContext = new History();       
-
-        OnClear(this, null);        
+        //this.historyListView.BindingContext = new History();
+        //OnClear(this, null);        
     }
 
 	void OnClear(object sender, EventArgs e)
@@ -48,9 +47,7 @@ public partial class MainPage : ContentPage
 		}
         
         currentState = CalculatorState.CalculationCompleted;
-        //history
-        currentOperationHistory = $"{firstNumber} * {firstNumber}";
-        UpdateHistory(sender, e, currentOperationHistory);
+        UpdateHistory(sender, e, $"{firstNumber} * {firstNumber}");
 
         firstNumber = firstNumber * firstNumber;
 		this.result.Text = firstNumber.ToString();
@@ -64,10 +61,7 @@ public partial class MainPage : ContentPage
         }
        
         currentState = CalculatorState.CalculationCompleted;
-
-        //history
-        currentOperationHistory = $"sqrt {firstNumber}";
-        UpdateHistory(sender, e, currentOperationHistory);
+        UpdateHistory(sender, e, $"sqrt {firstNumber}");
 
         firstNumber = Math.Sqrt(firstNumber);
         this.result.Text = firstNumber.ToString();        
@@ -148,10 +142,8 @@ public partial class MainPage : ContentPage
 
         operant = btnPressed;
         currentState = CalculatorState.GetSecondNumber;
-           
-        //history
-        currentOperationHistory = $"{firstNumber} {operant}";
-        UpdateHistory(sender, e, currentOperationHistory);        
+        
+        UpdateHistory(sender, e, $"{firstNumber} {operant}");        
     }
 
     //work around - optional parameters does not work with maui
@@ -168,10 +160,8 @@ public partial class MainPage : ContentPage
 			this.result.Text = result.ToString();
 
             currentState = CalculatorState.CalculationCompleted;
-
-            //history
-            currentOperationHistory = $"{firstNumber} {operant} {secondNumber}";
-            UpdateHistory(sender, e, currentOperationHistory);	
+                        
+            UpdateHistory(sender, e, $"{firstNumber} {operant} {secondNumber}");	
 
             firstNumber = result;
             operant = String.Empty;
@@ -193,24 +183,21 @@ public partial class MainPage : ContentPage
             } );
 
             //listview update broken - workaround
-            history.FirstOrDefault().IsUpdate = true;               
+            history.FirstOrDefault().IsUpdate = true;    
+
             this.historyListView.ItemsSource = "";
-            this.historyListView.ItemsSource = history;
+            this.historyListView.ItemsSource = history; 
             
             //work around for listview Microsoft Bug
             if (history.Count() > 3)
 			{
                 this.historyListView.ScrollTo(history.Last(), ScrollToPosition.End, false);
-            }         
-			
-			currentOperationHistory = string.Empty;
+            } 
 			currentHistory = string.Empty;
         }
         else if(currentHistory=="")
 		{
 			history.Clear();
-            
-            currentOperationHistory = string.Empty;
             this.historyListView.ItemsSource = "";
         }
 		
